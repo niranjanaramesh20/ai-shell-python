@@ -1,5 +1,6 @@
 import os
 import subprocess
+import shutil
 from google import genai
 from dotenv import load_dotenv
 
@@ -20,7 +21,14 @@ while True:
     if user_input.lower() == "exit":
         break
 
-    prompt = f"""
+    parts = user_input.split()
+
+    if parts and shutil.which(parts[0]):
+        subprocess.run(user_input, shell=True)
+
+    else:        
+
+        prompt = f"""
     You are a Linux shell assistant.
 
     Convert the user's input into exactly ONE valid Linux shell command.
@@ -34,15 +42,15 @@ while True:
 
     Request: {user_input}
     """
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-    )
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
     
-    command = response.text.strip()
-    print(f"Suggested command: {command}")
+        command = response.text.strip()
+        print(f"Suggested command: {command}")
 
-    confirm = input("Run command? (y/n): ")
+        confirm = input("Run command? (y/n): ")
 
-    if confirm.lower() == "y":
-        subprocess.run(command, shell=True)
+        if confirm.lower() == "y":
+            subprocess.run(command, shell=True)
